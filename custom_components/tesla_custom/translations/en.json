@@ -1,0 +1,21 @@
+{
+    "title": "Tesla Custom",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Connect to Tesla",
+                "description": "Enter your Tesla API token. You can generate one from https://www.myteslamate.com/tesla-token/",
+                "data": {
+                    "access_token": "OAuth API Token"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Failed to connect to Tesla API. Is the token valid?",
+            "no_vehicles": "No vehicles found for this token."
+        },
+        "abort": {
+            "already_configured": "Device is already configured"
+        }
+    }
+}

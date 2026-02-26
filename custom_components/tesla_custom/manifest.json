@@ -1,0 +1,16 @@
+{
+    "domain": "tesla_custom",
+    "name": "Tesla Custom",
+    "codeowners": [
+        "@uatec"
+    ],
+    "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://github.com/uatec/ha_tesla",
+    "integration_type": "hub",
+    "iot_class": "cloud_polling",
+    "requirements": [
+        "aiohttp"
+    ],
+    "version": "1.0.0"
+}
