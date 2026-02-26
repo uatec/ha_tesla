@@ -41,7 +41,13 @@ class TeslaAPI:
 
     async def get_vehicles(self) -> List[Dict[str, Any]]:
         """Get all vehicles."""
-        return await self._request("GET", "vehicles")
+        # Tesla removed the /vehicles endpoint, we must use /products
+        products = await self._request("GET", "products")
+        if not products:
+            return []
+        
+        # Filter for products that are actually vehicles (they have a VIN)
+        return [p for p in products if "vin" in p]
 
     async def get_vehicle_data(self, vehicle_id: str) -> Dict[str, Any]:
         """Get all vehicle data."""
