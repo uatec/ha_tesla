@@ -21,6 +21,7 @@ PLATFORMS: list[Platform] = [
     Platform.BUTTON,
     Platform.LOCK,
     Platform.DEVICE_TRACKER,
+    Platform.NUMBER,
 ]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

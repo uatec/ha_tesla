@@ -53,11 +53,11 @@ class TeslaAPI:
         """Get all vehicle data."""
         return await self._request("GET", f"vehicles/{vehicle_id}/vehicle_data")
 
-    async def command(self, vehicle_id: str, cmd: str, data: Optional[Dict[str, Any]] = None) -> Any:
+    async def command(self, vehicle_id: str, cmd: str, data: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Any:
         """Send a command to the vehicle."""
         if cmd == "wake_up":
             # Wake up is not a standard command endpoint pattern
             return await self._request("POST", f"vehicles/{vehicle_id}/wake_up")
         
         endpoint = f"vehicles/{vehicle_id}/command/{cmd}"
-        return await self._request("POST", endpoint, json=data or {})
+        return await self._request("POST", endpoint, json=data or {}, params=params)
