@@ -37,7 +37,7 @@ class TeslaDoorLock(TeslaBaseEntity, LockEntity):
         """Return true if locked."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("vehicle_state", {}).get("locked")
+        return (self.coordinator.data.get("vehicle_state") or {}).get("locked")
 
     async def async_lock(self, **kwargs):
         """Lock the car."""

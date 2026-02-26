@@ -66,7 +66,7 @@ class TeslaBatterySensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("charge_state", {}).get("battery_level")
+        return (self.coordinator.data.get("charge_state") or {}).get("battery_level")
 
 class TeslaRangeSensor(TeslaBaseEntity, SensorEntity):
     """Range sensor."""
@@ -77,7 +77,7 @@ class TeslaRangeSensor(TeslaBaseEntity, SensorEntity):
         self._attr_unique_id = f"{vehicle_id}_range"
         self._attr_name = "Ideal Range"
         self._attr_device_class = SensorDeviceClass.DISTANCE
-        gui = coordinator.data.get("gui_settings", {}) if coordinator.data else {}
+        gui = coordinator.data.get("gui_settings", {}) if self.coordinator.data else {}
         dist_units = gui.get("gui_distance_units", "mi/hr")
         self._attr_native_unit_of_measurement = UnitOfLength.KILOMETERS if "km" in dist_units.lower() else UnitOfLength.MILES
 
@@ -86,7 +86,7 @@ class TeslaRangeSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("charge_state", {}).get("ideal_battery_range")
+        return (self.coordinator.data.get("charge_state") or {}).get("ideal_battery_range") or 0.0
 
 class TeslaInsideTempSensor(TeslaBaseEntity, SensorEntity):
     """Inside temperature sensor."""
@@ -104,7 +104,7 @@ class TeslaInsideTempSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("climate_state", {}).get("inside_temp")
+        return (self.coordinator.data.get("climate_state") or {}).get("inside_temp")
 
 class TeslaOutsideTempSensor(TeslaBaseEntity, SensorEntity):
     """Outside temperature sensor."""
@@ -122,7 +122,7 @@ class TeslaOutsideTempSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("climate_state", {}).get("outside_temp")
+        return (self.coordinator.data.get("climate_state") or {}).get("outside_temp")
 
 class TeslaOdometerSensor(TeslaBaseEntity, SensorEntity):
     """Odometer sensor."""
@@ -133,7 +133,7 @@ class TeslaOdometerSensor(TeslaBaseEntity, SensorEntity):
         self._attr_unique_id = f"{vehicle_id}_odometer"
         self._attr_name = "Odometer"
         self._attr_device_class = SensorDeviceClass.DISTANCE
-        gui = coordinator.data.get("gui_settings", {}) if coordinator.data else {}
+        gui = coordinator.data.get("gui_settings", {}) if self.coordinator.data else {}
         dist_units = gui.get("gui_distance_units", "mi/hr")
         self._attr_native_unit_of_measurement = UnitOfLength.KILOMETERS if "km" in dist_units.lower() else UnitOfLength.MILES
 
@@ -142,7 +142,7 @@ class TeslaOdometerSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("vehicle_state", {}).get("odometer")
+        return (self.coordinator.data.get("vehicle_state") or {}).get("odometer") or 0.0
 
 class TeslaStateSensor(TeslaBaseEntity, SensorEntity):
     """State sensor."""
@@ -169,7 +169,7 @@ class TeslaSpeedSensor(TeslaBaseEntity, SensorEntity):
         self._attr_unique_id = f"{vehicle_id}_speed"
         self._attr_name = "Speed"
         self._attr_device_class = SensorDeviceClass.SPEED
-        gui = coordinator.data.get("gui_settings", {}) if coordinator.data else {}
+        gui = coordinator.data.get("gui_settings", {}) if self.coordinator.data else {}
         dist_units = gui.get("gui_distance_units", "mi/hr")
         self._attr_native_unit_of_measurement = "km/h" if "km" in dist_units.lower() else "mph"
 
@@ -178,7 +178,7 @@ class TeslaSpeedSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("speed") or 0
+        return (self.coordinator.data.get("drive_state") or {}).get("speed") or 0
 
 class TeslaPowerSensor(TeslaBaseEntity, SensorEntity):
     """Power sensor."""
@@ -196,10 +196,10 @@ class TeslaPowerSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        power = self.coordinator.data.get("drive_state", {}).get("power")
+        power = (self.coordinator.data.get("drive_state") or {}).get("power")
         if not power:
-            power = self.coordinator.data.get("charge_state", {}).get("charger_power", 0)
-        return power
+            power = (self.coordinator.data.get("charge_state") or {}).get("charger_power", 0)
+        return power or 0
 
 class TeslaChargeRateSensor(TeslaBaseEntity, SensorEntity):
     """Charge Rate sensor."""
@@ -216,7 +216,7 @@ class TeslaChargeRateSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("charge_state", {}).get("charge_rate")
+        return (self.coordinator.data.get("charge_state") or {}).get("charge_rate")
 
 class TeslaEnergyAddedSensor(TeslaBaseEntity, SensorEntity):
     """Energy Added sensor."""
@@ -234,7 +234,7 @@ class TeslaEnergyAddedSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("charge_state", {}).get("charge_energy_added")
+        return (self.coordinator.data.get("charge_state") or {}).get("charge_energy_added")
 
 class TeslaTimeToFullSensor(TeslaBaseEntity, SensorEntity):
     """Time to Full Charge sensor."""
@@ -252,7 +252,7 @@ class TeslaTimeToFullSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("charge_state", {}).get("time_to_full_charge")
+        return (self.coordinator.data.get("charge_state") or {}).get("time_to_full_charge")
 
 class TeslaHeadingSensor(TeslaBaseEntity, SensorEntity):
     """Heading sensor."""
@@ -269,7 +269,7 @@ class TeslaHeadingSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("heading") or 0
+        return (self.coordinator.data.get("drive_state") or {}).get("heading") or 0
 
 class TeslaShiftStateSensor(TeslaBaseEntity, SensorEntity):
     """Shift State sensor."""
@@ -285,7 +285,7 @@ class TeslaShiftStateSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("shift_state") or "P"
+        return (self.coordinator.data.get("drive_state") or {}).get("shift_state") or "P"
 
 class TeslaSoftwareVersionSensor(TeslaBaseEntity, SensorEntity):
     """Software version sensor."""
@@ -301,4 +301,4 @@ class TeslaSoftwareVersionSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("vehicle_state", {}).get("car_version")
+        return (self.coordinator.data.get("vehicle_state") or {}).get("car_version")

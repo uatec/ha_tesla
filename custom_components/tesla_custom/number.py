@@ -43,7 +43,7 @@ class TeslaChargeLimitNumber(TeslaBaseEntity, NumberEntity):
         """Return the state of the entity."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("charge_state", {}).get("charge_limit_soc")
+        return (self.coordinator.data.get("charge_state") or {}).get("charge_limit_soc")
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
@@ -73,7 +73,7 @@ class TeslaTemperatureNumber(TeslaBaseEntity, NumberEntity):
         """Return the state of the entity."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("climate_state", {}).get("driver_temp_setting")
+        return (self.coordinator.data.get("climate_state") or {}).get("driver_temp_setting")
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""

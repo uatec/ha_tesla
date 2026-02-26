@@ -43,7 +43,7 @@ class TeslaSentryModeSwitch(TeslaBaseEntity, SwitchEntity):
         """Return true if switch is on."""
         if not self.coordinator.data:
             return False
-        return self.coordinator.data.get("vehicle_state", {}).get("sentry_mode")
+        return (self.coordinator.data.get("vehicle_state") or {}).get("sentry_mode")
 
     async def async_turn_on(self, **kwargs):
         """Turn on the switch."""
@@ -71,7 +71,7 @@ class TeslaClimateSwitch(TeslaBaseEntity, SwitchEntity):
         """Return true if switch is on."""
         if not self.coordinator.data:
             return False
-        return self.coordinator.data.get("climate_state", {}).get("is_climate_on")
+        return (self.coordinator.data.get("climate_state") or {}).get("is_climate_on")
 
     async def async_turn_on(self, **kwargs):
         """Turn on the switch."""
@@ -99,7 +99,7 @@ class TeslaValetModeSwitch(TeslaBaseEntity, SwitchEntity):
         """Return true if switch is on."""
         if not self.coordinator.data:
             return False
-        return self.coordinator.data.get("vehicle_state", {}).get("valet_mode")
+        return (self.coordinator.data.get("vehicle_state") or {}).get("valet_mode")
 
     async def async_turn_on(self, **kwargs):
         """Turn on the switch."""
@@ -129,7 +129,7 @@ class TeslaChargingSwitch(TeslaBaseEntity, SwitchEntity):
         """Return true if switch is on."""
         if not self.coordinator.data:
             return False
-        return self.coordinator.data.get("charge_state", {}).get("charging_state") == "Charging"
+        return (self.coordinator.data.get("charge_state") or {}).get("charging_state") == "Charging"
 
     async def async_turn_on(self, **kwargs):
         """Turn on the switch."""
@@ -158,7 +158,7 @@ class TeslaMaxRangeSwitch(TeslaBaseEntity, SwitchEntity):
         if not self.coordinator.data:
             return False
         # If the charge limit is 100%, consider "max range" to be on
-        return self.coordinator.data.get("charge_state", {}).get("charge_limit_soc") == 100
+        return (self.coordinator.data.get("charge_state") or {}).get("charge_limit_soc") == 100
 
     async def async_turn_on(self, **kwargs):
         """Turn on the switch."""
@@ -185,7 +185,7 @@ class TeslaChargePortSwitch(TeslaBaseEntity, SwitchEntity):
         """Return true if switch is on."""
         if not self.coordinator.data:
             return False
-        return self.coordinator.data.get("charge_state", {}).get("charge_port_door_open")
+        return (self.coordinator.data.get("charge_state") or {}).get("charge_port_door_open")
 
     async def async_turn_on(self, **kwargs):
         """Turn on the switch."""

@@ -41,14 +41,14 @@ class TeslaDeviceTracker(TeslaBaseEntity, TrackerEntity):
         """Return latitude."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("latitude")
+        return (self.coordinator.data.get("drive_state") or {}).get("latitude")
 
     @property
     def longitude(self):
         """Return longitude."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("longitude")
+        return (self.coordinator.data.get("drive_state") or {}).get("longitude")
 
     @property
     def location_accuracy(self):
