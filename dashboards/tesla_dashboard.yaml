@@ -1,0 +1,45 @@
+title: Tesla Dashboard
+views:
+  - title: My Tesla
+    icon: mdi:car
+    cards:
+      - type: picture-entity
+        entity: sensor.tesla_state
+        state_image:
+          online: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/2018_Tesla_Model_S_75D.jpg/1200px-2018_Tesla_Model_S_75D.jpg"
+          asleep: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/2018_Tesla_Model_S_75D.jpg/1200px-2018_Tesla_Model_S_75D.jpg"
+      - type: entities
+        title: Vehicle Status
+        entities:
+          - sensor.tesla_battery
+          - sensor.tesla_ideal_range
+          - sensor.tesla_odometer
+          - sensor.tesla_inside_temperature
+          - sensor.tesla_outside_temperature
+      - type: grid
+        columns: 2
+        cards:
+          - type: button
+            entity: button.tesla_wake_up
+            show_name: true
+            show_icon: true
+          - type: button
+            entity: lock.tesla_doors
+            show_name: true
+            show_icon: true
+          - type: button
+            entity: button.tesla_honk_horn
+            show_name: true
+            show_icon: true
+          - type: button
+            entity: button.tesla_flash_lights
+            show_name: true
+            show_icon: true
+      - type: entities
+        title: Controls
+        entities:
+          - switch.tesla_climate
+          - switch.tesla_sentry_mode
+      - type: map
+        entities:
+          - device_tracker.tesla_location
