@@ -21,8 +21,6 @@ async def async_setup_entry(
         TeslaWakeUpButton(coordinator, vehicle_id, vehicle_info, api),
         TeslaHornButton(coordinator, vehicle_id, vehicle_info, api),
         TeslaFlashLightsButton(coordinator, vehicle_id, vehicle_info, api),
-        TeslaOpenChargePortButton(coordinator, vehicle_id, vehicle_info, api),
-        TeslaCloseChargePortButton(coordinator, vehicle_id, vehicle_info, api),
         TeslaActuateTrunkButton(coordinator, vehicle_id, vehicle_info, api),
         TeslaActuateFrunkButton(coordinator, vehicle_id, vehicle_info, api),
     ]
@@ -55,14 +53,6 @@ class TeslaHornButton(TeslaCommandButton):
 class TeslaFlashLightsButton(TeslaCommandButton):
     def __init__(self, coordinator, vehicle_id, vehicle_info, api):
         super().__init__(coordinator, vehicle_id, vehicle_info, api, "flash_lights", "Flash Lights", "mdi:car-light-high")
-
-class TeslaOpenChargePortButton(TeslaCommandButton):
-    def __init__(self, coordinator, vehicle_id, vehicle_info, api):
-        super().__init__(coordinator, vehicle_id, vehicle_info, api, "charge_port_door_open", "Open Charge Port", "mdi:ev-plug-tesla")
-
-class TeslaCloseChargePortButton(TeslaCommandButton):
-    def __init__(self, coordinator, vehicle_id, vehicle_info, api):
-        super().__init__(coordinator, vehicle_id, vehicle_info, api, "charge_port_door_close", "Close Charge Port", "mdi:ev-plug-tesla")
 
 class TeslaActuateTrunkButton(TeslaBaseEntity, ButtonEntity):
     def __init__(self, coordinator, vehicle_id, vehicle_info, api):

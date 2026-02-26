@@ -23,6 +23,7 @@ async def async_setup_entry(
         TeslaValetModeSwitch(coordinator, vehicle_id, vehicle_info, api),
         TeslaChargingSwitch(coordinator, vehicle_id, vehicle_info, api),
         TeslaMaxRangeSwitch(coordinator, vehicle_id, vehicle_info, api),
+        TeslaChargePortSwitch(coordinator, vehicle_id, vehicle_info, api),
     ]
     async_add_entities(switches)
 
@@ -168,3 +169,31 @@ class TeslaMaxRangeSwitch(TeslaBaseEntity, SwitchEntity):
         """Turn off the switch."""
         await self.api.command(self.vehicle_id, "charge_standard")
         await self.coordinator.async_request_refresh()
+
+class TeslaChargePortSwitch(TeslaBaseEntity, SwitchEntity):
+    """Charge Port switch."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info, api):
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self.api = api
+        self._attr_unique_id = f"{vehicle_id}_charge_port"
+        self._attr_name = "Charge Port"
+        self._attr_icon = "mdi:ev-plug-tesla"
+
+    @property
+    def is_on(self):
+        """Return true if switch is on."""
+        if not self.coordinator.data:
+            return False
+        return self.coordinator.data.get("charge_state", {}).get("charge_port_door_open")
+
+    async def async_turn_on(self, **kwargs):
+        """Turn on the switch."""
+        await self.api.command(self.vehicle_id, "charge_port_door_open")
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs):
+        """Turn off the switch."""
+        await self.api.command(self.vehicle_id, "charge_port_door_close")
+        await self.coordinator.async_request_refresh()
+

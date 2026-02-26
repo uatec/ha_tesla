@@ -49,3 +49,8 @@ class TeslaDeviceTracker(TeslaBaseEntity, TrackerEntity):
         if not self.coordinator.data:
             return None
         return self.coordinator.data.get("drive_state", {}).get("longitude")
+
+    @property
+    def location_accuracy(self):
+        """Return the location accuracy of the device."""
+        return 0

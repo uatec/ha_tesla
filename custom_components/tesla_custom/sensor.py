@@ -77,7 +77,9 @@ class TeslaRangeSensor(TeslaBaseEntity, SensorEntity):
         self._attr_unique_id = f"{vehicle_id}_range"
         self._attr_name = "Ideal Range"
         self._attr_device_class = SensorDeviceClass.DISTANCE
-        self._attr_native_unit_of_measurement = UnitOfLength.MILES
+        gui = coordinator.data.get("gui_settings", {}) if coordinator.data else {}
+        dist_units = gui.get("gui_distance_units", "mi/hr")
+        self._attr_native_unit_of_measurement = UnitOfLength.KILOMETERS if "km" in dist_units.lower() else UnitOfLength.MILES
 
     @property
     def native_value(self):
@@ -131,7 +133,9 @@ class TeslaOdometerSensor(TeslaBaseEntity, SensorEntity):
         self._attr_unique_id = f"{vehicle_id}_odometer"
         self._attr_name = "Odometer"
         self._attr_device_class = SensorDeviceClass.DISTANCE
-        self._attr_native_unit_of_measurement = UnitOfLength.MILES
+        gui = coordinator.data.get("gui_settings", {}) if coordinator.data else {}
+        dist_units = gui.get("gui_distance_units", "mi/hr")
+        self._attr_native_unit_of_measurement = UnitOfLength.KILOMETERS if "km" in dist_units.lower() else UnitOfLength.MILES
 
     @property
     def native_value(self):
@@ -165,14 +169,16 @@ class TeslaSpeedSensor(TeslaBaseEntity, SensorEntity):
         self._attr_unique_id = f"{vehicle_id}_speed"
         self._attr_name = "Speed"
         self._attr_device_class = SensorDeviceClass.SPEED
-        self._attr_native_unit_of_measurement = "mph" # Default, could dynamically adjust based on gui_settings
+        gui = coordinator.data.get("gui_settings", {}) if coordinator.data else {}
+        dist_units = gui.get("gui_distance_units", "mi/hr")
+        self._attr_native_unit_of_measurement = "km/h" if "km" in dist_units.lower() else "mph"
 
     @property
     def native_value(self):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("speed")
+        return self.coordinator.data.get("drive_state", {}).get("speed") or 0
 
 class TeslaPowerSensor(TeslaBaseEntity, SensorEntity):
     """Power sensor."""
@@ -190,7 +196,10 @@ class TeslaPowerSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("power")
+        power = self.coordinator.data.get("drive_state", {}).get("power")
+        if not power:
+            power = self.coordinator.data.get("charge_state", {}).get("charger_power", 0)
+        return power
 
 class TeslaChargeRateSensor(TeslaBaseEntity, SensorEntity):
     """Charge Rate sensor."""
@@ -260,7 +269,7 @@ class TeslaHeadingSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("heading")
+        return self.coordinator.data.get("drive_state", {}).get("heading") or 0
 
 class TeslaShiftStateSensor(TeslaBaseEntity, SensorEntity):
     """Shift State sensor."""
@@ -276,7 +285,7 @@ class TeslaShiftStateSensor(TeslaBaseEntity, SensorEntity):
         """Return the state of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("drive_state", {}).get("shift_state")
+        return self.coordinator.data.get("drive_state", {}).get("shift_state") or "P"
 
 class TeslaSoftwareVersionSensor(TeslaBaseEntity, SensorEntity):
     """Software version sensor."""
