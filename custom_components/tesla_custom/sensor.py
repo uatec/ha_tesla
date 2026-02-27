@@ -45,6 +45,8 @@ async def async_setup_entry(
         TeslaRearLeftSeatHeaterSensor(coordinator, vehicle_id, vehicle_info),
         TeslaRearRightSeatHeaterSensor(coordinator, vehicle_id, vehicle_info),
         TeslaRearCenterSeatHeaterSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaLatitudeSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaLongitudeSensor(coordinator, vehicle_id, vehicle_info),
     ]
     async_add_entities(sensors)
 
@@ -544,3 +546,37 @@ class TeslaRearCenterSeatHeaterSensor(TeslaBaseEntity, SensorEntity):
         if not self.coordinator.data:
             return None
         return (self.coordinator.data.get("climate_state") or {}).get("seat_heater_rear_center")
+
+class TeslaLatitudeSensor(TeslaBaseEntity, SensorEntity):
+    """Latitude sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_latitude"
+        self._attr_name = "Latitude"
+        self._attr_icon = "mdi:latitude"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("drive_state") or {}).get("latitude")
+
+class TeslaLongitudeSensor(TeslaBaseEntity, SensorEntity):
+    """Longitude sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_longitude"
+        self._attr_name = "Longitude"
+        self._attr_icon = "mdi:longitude"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("drive_state") or {}).get("longitude")
