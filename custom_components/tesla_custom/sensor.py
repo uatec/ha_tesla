@@ -32,6 +32,12 @@ async def async_setup_entry(
         TeslaHeadingSensor(coordinator, vehicle_id, vehicle_info),
         TeslaShiftStateSensor(coordinator, vehicle_id, vehicle_info),
         TeslaSoftwareVersionSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaChargerVoltageSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaChargerActualCurrentSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaUsableBatteryLevelSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaLeftSeatHeaterSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaRightSeatHeaterSensor(coordinator, vehicle_id, vehicle_info),
+        TeslaCenterDisplayStateSensor(coordinator, vehicle_id, vehicle_info),
     ]
     async_add_entities(sensors)
 
@@ -302,3 +308,108 @@ class TeslaSoftwareVersionSensor(TeslaBaseEntity, SensorEntity):
         if not self.coordinator.data:
             return None
         return (self.coordinator.data.get("vehicle_state") or {}).get("car_version")
+
+class TeslaChargerVoltageSensor(TeslaBaseEntity, SensorEntity):
+    """Charger Voltage sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_charger_voltage"
+        self._attr_name = "Charger Voltage"
+        self._attr_device_class = SensorDeviceClass.VOLTAGE
+        self._attr_native_unit_of_measurement = "V"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("charge_state") or {}).get("charger_voltage")
+
+class TeslaChargerActualCurrentSensor(TeslaBaseEntity, SensorEntity):
+    """Charger Actual Current sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_charger_actual_current"
+        self._attr_name = "Charger Actual Current"
+        self._attr_device_class = SensorDeviceClass.CURRENT
+        self._attr_native_unit_of_measurement = "A"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("charge_state") or {}).get("charger_actual_current")
+
+class TeslaUsableBatteryLevelSensor(TeslaBaseEntity, SensorEntity):
+    """Usable Battery Level sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_usable_battery_level"
+        self._attr_name = "Usable Battery Level"
+        self._attr_device_class = SensorDeviceClass.BATTERY
+        self._attr_native_unit_of_measurement = PERCENTAGE
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("charge_state") or {}).get("usable_battery_level")
+
+class TeslaLeftSeatHeaterSensor(TeslaBaseEntity, SensorEntity):
+    """Left Seat Heater Level sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_seat_heater_left"
+        self._attr_name = "Left Seat Heater Level"
+        self._attr_icon = "mdi:car-seat-heater"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("climate_state") or {}).get("seat_heater_left")
+
+class TeslaRightSeatHeaterSensor(TeslaBaseEntity, SensorEntity):
+    """Right Seat Heater Level sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_seat_heater_right"
+        self._attr_name = "Right Seat Heater Level"
+        self._attr_icon = "mdi:car-seat-heater"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("climate_state") or {}).get("seat_heater_right")
+
+class TeslaCenterDisplayStateSensor(TeslaBaseEntity, SensorEntity):
+    """Center Display State sensor."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self._attr_unique_id = f"{vehicle_id}_center_display_state"
+        self._attr_name = "Center Display State"
+        self._attr_icon = "mdi:monitor-dashboard"
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("vehicle_state") or {}).get("center_display_state")
