@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DOMAIN, UPDATE_INTERVAL
+from .const import DOMAIN, UPDATE_INTERVAL, CONF_REFRESH_TOKEN
 from .tesla_api import TeslaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,8 +31,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
 
     token = entry.data[CONF_ACCESS_TOKEN]
+    refresh_token = entry.data.get(CONF_REFRESH_TOKEN)
     session = async_get_clientsession(hass)
-    api = TeslaAPI(token, session)
+
+    async def token_refresh_cb(new_token: str, new_refresh_token: str):
+        """Callback to save the new tokens."""
+        hass.config_entries.async_update_entry(
+            entry,
+            data={
+                **entry.data,
+                CONF_ACCESS_TOKEN: new_token,
+                CONF_REFRESH_TOKEN: new_refresh_token,
+            },
+        )
+
+    api = TeslaAPI(token, session, refresh_token=refresh_token, token_refresh_cb=token_refresh_cb)
 
     try:
         vehicles = await api.get_vehicles()

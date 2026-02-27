@@ -8,10 +8,12 @@ _LOGGER = logging.getLogger(__name__)
 class TeslaAPI:
     """Client for Tesla Owner API."""
 
-    def __init__(self, token: str, session: aiohttp.ClientSession):
+    def __init__(self, token: str, session: aiohttp.ClientSession, refresh_token: Optional[str] = None, token_refresh_cb=None):
         """Initialize the API client."""
         self.token = token
         self.session = session
+        self.refresh_token = refresh_token
+        self.token_refresh_cb = token_refresh_cb
         self.base_url = "https://owner-api.teslamotors.com/api/1"
 
     @property
@@ -28,16 +30,42 @@ class TeslaAPI:
         """Make an API request."""
         url = f"{self.base_url}/{endpoint}"
         try:
-            async with self.session.request(method, url, headers=self.headers, **kwargs) as resp:
-                resp.raise_for_status()
-                data = await resp.json()
-                return data.get("response")
-        except aiohttp.ClientError as err:
-            _LOGGER.error("Error connecting to Tesla API: %s", err)
-            raise
+            return await self._execute_request(method, url, **kwargs)
+        except aiohttp.ClientResponseError as err:
+            if err.status == 401 and self.refresh_token:
+                _LOGGER.info("Access token expired. Attempting to refresh.")
+                await self.async_refresh_token()
+                # Retry the request with the new token
+                return await self._execute_request(method, url, **kwargs)
+            else:
+                _LOGGER.error("Error connecting to Tesla API: %s", err)
+                raise
         except Exception as err:
             _LOGGER.error("Unexpected error from Tesla API: %s", err)
             raise
+
+    async def _execute_request(self, method: str, url: str, **kwargs) -> Any:
+        async with self.session.request(method, url, headers=self.headers, **kwargs) as resp:
+            resp.raise_for_status()
+            data = await resp.json()
+            return data.get("response")
+
+    async def async_refresh_token(self):
+        """Refresh the access token."""
+        url = "https://auth.tesla.com/oauth2/v3/token"
+        payload = {
+            "grant_type": "refresh_token",
+            "client_id": "ownerapi",
+            "refresh_token": self.refresh_token,
+        }
+        async with self.session.post(url, json=payload) as resp:
+            resp.raise_for_status()
+            data = await resp.json()
+            self.token = data["access_token"]
+            self.refresh_token = data.get("refresh_token", self.refresh_token)
+            
+            if self.token_refresh_cb:
+                await self.token_refresh_cb(self.token, self.refresh_token)
 
     async def get_vehicles(self) -> List[Dict[str, Any]]:
         """Get all vehicles."""

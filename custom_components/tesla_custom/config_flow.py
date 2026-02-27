@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_REFRESH_TOKEN
 from .tesla_api import TeslaAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -18,13 +18,14 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_ACCESS_TOKEN): str,
+        vol.Optional(CONF_REFRESH_TOKEN): str,
     }
 )
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect."""
     session = async_get_clientsession(hass)
-    api = TeslaAPI(data[CONF_ACCESS_TOKEN], session)
+    api = TeslaAPI(data[CONF_ACCESS_TOKEN], session, data.get(CONF_REFRESH_TOKEN))
     
     vehicles = await api.get_vehicles()
     if not vehicles:
