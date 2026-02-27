@@ -21,6 +21,7 @@ async def async_setup_entry(
     numbers = [
         TeslaChargeLimitNumber(coordinator, vehicle_id, vehicle_info, api),
         TeslaTemperatureNumber(coordinator, vehicle_id, vehicle_info, api),
+        TeslaSpeedLimitNumber(coordinator, vehicle_id, vehicle_info, api),
     ]
     async_add_entities(numbers)
 
@@ -84,5 +85,36 @@ class TeslaTemperatureNumber(TeslaBaseEntity, NumberEntity):
                 "driver_temp": value,
                 "passenger_temp": value
             }
+        )
+        await self.coordinator.async_request_refresh()
+
+class TeslaSpeedLimitNumber(TeslaBaseEntity, NumberEntity):
+    """Speed limit set number."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info, api):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self.api = api
+        self._attr_unique_id = f"{vehicle_id}_speed_limit_set"
+        self._attr_name = "Set Speed Limit"
+        self._attr_native_unit_of_measurement = "mph"
+        self._attr_native_min_value = 50
+        self._attr_native_max_value = 90
+        self._attr_native_step = 1
+        self._attr_icon = "mdi:speedometer"
+
+    @property
+    def native_value(self):
+        """Return the state of the entity."""
+        if not self.coordinator.data:
+            return None
+        return (self.coordinator.data.get("vehicle_state") or {}).get("speed_limit_mode", {}).get("current_limit_mph")
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        await self.api.command(
+            self.vehicle_id,
+            "speed_limit_set_limit",
+            params={"limit_mph": int(value)}
         )
         await self.coordinator.async_request_refresh()

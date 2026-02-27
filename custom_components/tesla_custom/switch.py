@@ -24,6 +24,7 @@ async def async_setup_entry(
         TeslaChargingSwitch(coordinator, vehicle_id, vehicle_info, api),
         TeslaMaxRangeSwitch(coordinator, vehicle_id, vehicle_info, api),
         TeslaChargePortSwitch(coordinator, vehicle_id, vehicle_info, api),
+        TeslaSpeedLimitSwitch(coordinator, vehicle_id, vehicle_info, api),
     ]
     async_add_entities(switches)
 
@@ -197,3 +198,30 @@ class TeslaChargePortSwitch(TeslaBaseEntity, SwitchEntity):
         await self.api.command(self.vehicle_id, "charge_port_door_close")
         await self.coordinator.async_request_refresh()
 
+class TeslaSpeedLimitSwitch(TeslaBaseEntity, SwitchEntity):
+    """Speed Limit switch."""
+    
+    def __init__(self, coordinator, vehicle_id, vehicle_info, api):
+        """Init."""
+        super().__init__(coordinator, vehicle_id, vehicle_info)
+        self.api = api
+        self._attr_unique_id = f"{vehicle_id}_speed_limit"
+        self._attr_name = "Speed Limit"
+        self._attr_icon = "mdi:car-speed-limiter"
+
+    @property
+    def is_on(self):
+        """Return true if switch is on."""
+        if not self.coordinator.data:
+            return False
+        return (self.coordinator.data.get("vehicle_state") or {}).get("speed_limit_mode", {}).get("active")
+
+    async def async_turn_on(self, **kwargs):
+        """Turn on the switch."""
+        await self.api.command(self.vehicle_id, "speed_limit_activate", data={"pin": "0000"})
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs):
+        """Turn off the switch."""
+        await self.api.command(self.vehicle_id, "speed_limit_deactivate", data={"pin": "0000"})
+        await self.coordinator.async_request_refresh()
