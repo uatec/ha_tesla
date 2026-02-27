@@ -51,7 +51,11 @@ class TeslaAPI:
 
     async def get_vehicle_data(self, vehicle_id: str) -> Dict[str, Any]:
         """Get all vehicle data."""
-        return await self._request("GET", f"vehicles/{vehicle_id}/vehicle_data")
+        endpoints = (
+            "location_data;charge_state;climate_state;closures_state;"
+            "drive_state;gui_settings;vehicle_config;vehicle_state;vehicle_data_combo"
+        )
+        return await self._request("GET", f"vehicles/{vehicle_id}/vehicle_data", params={"endpoints": endpoints})
 
     async def command(self, vehicle_id: str, cmd: str, data: Optional[Dict[str, Any]] = None, params: Optional[Dict[str, Any]] = None) -> Any:
         """Send a command to the vehicle."""
