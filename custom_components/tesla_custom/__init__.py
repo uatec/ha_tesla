@@ -23,6 +23,7 @@ PLATFORMS: list[Platform] = [
     Platform.LOCK,
     Platform.DEVICE_TRACKER,
     Platform.NUMBER,
+    Platform.COVER,
 ]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
